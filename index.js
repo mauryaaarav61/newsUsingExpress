@@ -1,17 +1,22 @@
-
 async function fetchNews(news) {
     const apiKey = "1a97b38b931648cf924bcdffcb983ea2";
-    const apiUrl = `https://newsapi.org/v2/everything?q=${news}&apiKey=${apiKey}`;
+    const apiUrl = `https://newsapi.org/v2/everything?q=${news}&from=2023-11-17&sortBy=publishedAt&apiKey=${apiKey}`;
   
     try {
       const response = await fetch(apiUrl);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
       const data = await response.json();
   
-      if (data.articles && Array.isArray(data.articles)) {
-        
-        displayNews(data.articles);
+      if (data.status === 'error') {
+        throw new Error(`News API error: ${data.message}`);
+      }
   
-       
+      if (data.articles && Array.isArray(data.articles)) {
+        displayNews(data.articles);
         updateHeader(news);
       } else {
         console.error("Invalid data structure:", data);
@@ -21,6 +26,7 @@ async function fetchNews(news) {
       console.error("Error fetching news:", error);
     }
   }
+  
   
   function displayNews(articles) {
     const newsContainer = document.getElementById("news_paragraph");
